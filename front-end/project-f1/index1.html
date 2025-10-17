@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <title>𝐅𝟏 𝐅𝐎́𝐑𝐔𝐌 - Dashboard</title>
+  <link rel="shortcut icon" href="pixil-frame-0_1.ico" type="image/x-icon">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --main-bg: linear-gradient(135deg, #222 60%, #111 100%);
+      --main-color: #fff;
+      --accent: #5be6ff;
+      --danger: #ff5555;
+      --navbar-bg: rgba(20,20,20,0.98);
+      --card-bg: #181818e0;
+      --table-bg: #181818e0;
+    }
+    [data-theme="light"] {
+      --main-bg: linear-gradient(135deg, #e3e3e3 60%, #fff 100%);
+      --main-color: #222;
+      --accent: #0077ff;
+      --danger: #ff5555;
+      --navbar-bg: #f5f5f5;
+      --card-bg: #fff;
+      --table-bg: #fff;
+    }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: var(--main-bg);
+      color: var(--main-color);
+      transition: background 0.3s, color 0.3s;
+    }
+    .navbar {
+      background: var(--navbar-bg);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      border-bottom: 4px solid var(--danger);
+      border-top: 4px solid var(--danger);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: 0 2px 8px #00000040;
+    }
+    .logo img {
+      height: 56px;
+      margin-right: 24px;
+    }
+    .search-bar {
+      margin-left: 24px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1em;
+      width: 180px;
+    }
+    .notif-btn {
+      background: var(--accent);
+      color: var(--main-bg);
+      border: none;
+      border-radius: 8px;
+      padding: 8px 14px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-left: 12px;
+      transition: background 0.2s, color 0.2s;
+    }
+    .notif-btn:hover {
+      background: var(--danger);
+      color: #fff;
+    }
+    .access-btn {
+      background: #222;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 14px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-left: 12px;
+      transition: background 0.2s, color 0.2s;
+    }
+    .access-btn.active {
+      background: #fff;
+      color: #222;
+      font-size: 1.2em;
+    }
+    .nav-item {
+      margin-right: 1.5rem;
+      position: relative;
+    }
+    .nav-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 1.1em;
+      padding: 1rem 0.5rem;
+      display: block;
+      border-radius: 5px;
+      font-weight: 600;
+      transition: color 0.2s, background 0.2s, transform 0.2s;
+      cursor: pointer;
+    }
+    .nav-link:hover, .dropdown-content a:hover {
+      color: var(--main-color);
+      background: var(--danger);
+      transform: scale(1.06);
+    }
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background: var(--navbar-bg);
+      min-width: 180px;
+      box-shadow: 0 8px 16px #00000040;
+      border-radius: 8px;
+      z-index: 20;
+      top: 100%;
+      left: 0;
+      animation: fadeIn 0.3s;
+    }
+    .dropdown-content a {
+      color: var(--accent);
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      border-radius: 5px;
+      transition: background 0.2s, color 0.2s;
+    }
+    .dropdown:hover .dropdown-content,
+    .dropdown:focus-within .dropdown-content {
+      display: block;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+    .user-area {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .user-pic {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--main-bg);
+      font-weight: bold;
+      font-size: 1.1em;
+      margin-right: 8px;
+    }
+    .theme-btn {
+      background: var(--accent);
+      color: var(--main-bg);
+      border: none;
+      border-radius: 8px;
+      padding: 8px 14px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.2s, color 0.2s;
+    }
+    .theme-btn:hover {
+      background: var(--danger);
+      color: #fff;
+    }
+    .conteudo-lateral {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 32px;
+      margin: 40px 0 24px 0;
+    }
+    .carousel-container {
+      width: 340px;
+      min-width: 260px;
+      background: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: 0 4px 24px var(--danger);
+      padding: 18px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .carousel {
+      width: 100%;
+      height: 220px;
+      overflow: hidden;
+      position: relative;
+      border-radius: 12px;
+      margin-bottom: 12px;
+    }
+    .news-item {
+      display: none;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      left: 0; top: 0;
+      transition: opacity 0.4s;
+    }
+    .news-item.active {
+      display: block;
+      opacity: 1;
+      z-index: 2;
+      animation: fadeIn 0.5s;
+    }
+    .news-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px #00000060;
+    }
+    .carousel-controls {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      margin-top: 8px;
+    }
+    .arrow {
+      background: var(--navbar-bg);
+      color: var(--accent);
+      border: none;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      font-size: 1.5em;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .arrow:hover {
+      background: var(--danger);
+      color: #fff;
+    }
+    .outra-secao {
+      background: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: 0 4px 24px var(--danger);
+      padding: 24px 18px 18px 18px;
+      width: 340px;
+      min-width: 260px;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    .outra-secao.visible {
+      display: flex;
+      animation: fadeIn 0.5s;
+    }
+    .outra-secao h2 {
+      color: var(--accent);
+      font-size: 1.3em;
+      margin-bottom: 8px;
+    }
+    .outra-secao p {
+      color: #ccc;
+      margin-bottom: 8px;
+    }
+    .outra-secao ul {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--danger);
+    }
+    .extra-info {
+      width: 100%;
+      max-width: 900px;
+      margin: 32px auto 0 auto;
+      background: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: 0 4px 24px var(--danger);
+      padding: 24px;
+      text-align: center;
+      color: var(--main-color);
+    }
+    .extra-info h3 {
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .extra-info p {
+      color: #ccc;
+      margin-bottom: 8px;
+    }
+    .extra-info a {
+      color: var(--danger);
+      text-decoration: underline;
+      font-weight: bold;
+      transition: color 0.2s;
+    }
+    .extra-info a:hover {
+      color: var(--accent);
+    }
+    #notif-popup {
+      display:none;
+      position:fixed;
+      top:80px;
+      right:20px;
+      background:#222;
+      color:#fff;
+      padding:16px;
+      border-radius:12px;
+      box-shadow:0 2px 8px #000;
+      z-index:100;
+    }
+    @media (max-width: 800px) {
+      .conteudo-lateral {
+        flex-direction: column;
+        align-items: center;
+        gap: 18px;
+      }
+      .carousel-container, .outra-secao {
+        width: 95vw;
+        max-width: 340px;
+      }
+      .dropdown-content { left: 0; min-width: 90vw; }
+      .extra-info { padding: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="logo">
+      <img src="f1logo1-removebg-preview.png" alt="F1 Logo">
+    </div>
+    <input type="text" class="search-bar" placeholder="Buscar piloto, prova...">
+    <button class="notif-btn" onclick="showNotif()">🔔</button>
+    <button class="access-btn" id="accessBtn" onclick="toggleAccess()">A+</button>
+    <div class="nav-item dropdown">
+      <a href="index1.html" class="nav-link">Dashboard</a>
+      <div class="dropdown-content">
+        <a href="index1.html">Página Inicial</a>
+        <a href="index2.html">Ranking Pilotos</a>
+        <a href="equipes.html">Ranking Equipes</a>
+        <a href="perfil.html">Meu Perfil</a>
+      </div>
+    </div>
+    <div class="nav-item dropdown">
+      <a href="index2.html" class="nav-link">Pilotos</a>
+      <div class="dropdown-content">
+        <a href="index2.html">Top 3 Pilotos</a>
+        <a href="piloto.html?id=1">Detalhes Piloto</a>
+        <a href="#">Histórico</a>
+      </div>
+    </div>
+    <div class="nav-item dropdown">
+      <a href="provas.html" class="nav-link">Provas</a>
+      <div class="dropdown-content">
+        <a href="prova.html?id=monaco">GP de Mônaco</a>
+        <a href="prova.html?id=brasil">GP do Brasil</a>
+        <a href="calendario.html">Calendário 2025</a>
+      </div>
+    </div>
+    <div class="nav-item dropdown">
+      <a href="forum.html" class="nav-link">Fórum</a>
+      <div class="dropdown-content">
+        <a href="forum.html">Comentários</a>
+        <a href="notificacoes.html">Notificações</a>
+      </div>
+    </div>
+    <div class="user-area">
+      <a href="perfil.html"><div class="user-pic" title="Usuário">IZ</div></a>
+      <button class="theme-btn" onclick="toggleTheme()">🌙/☀️</button>
+    </div>
+  </nav>
+  <div class="conteudo-lateral">
+    <div class="carousel-container">
+      <div class="carousel" id="carousel">
+        <div class="news-item active">
+          <img src="gp-monaco-2025.jpg" alt="GP de Mônaco">
+        </div>
+        <div class="news-item">
+          <img src="gp-brasil-2025.jpg" alt="GP do Brasil">
+        </div>
+        <div class="news-item">
+          <img src="gp-japao-2025.jpg" alt="GP do Japão">
+        </div>
+      </div>
+      <div class="carousel-controls">
+        <button class="arrow" onclick="moveSlide(-1)">&#8592;</button>
+        <button class="arrow" onclick="moveSlide(1)">&#8594;</button>
+      </div>
+    </div>
+    <div class="outra-secao visible" id="side-content"></div>
+  </div>
+  <div class="extra-info">
+    <h3>Bem-vindo ao F1 Fórum!</h3>
+    <p>Veja as últimas notícias, estatísticas e rankings dos pilotos e equipes da temporada 2025.</p>
+    <p>Acompanhe os <a href="index2.html">Top 3 Pilotos</a> ou confira o <a href="calendario.html">Calendário de Provas</a>.</p>
+    <p>Participe do nosso fórum e compartilhe suas opiniões sobre cada corrida!</p>
+  </div>
+  <div id="notif-popup">
+    <strong>Notificações:</strong>
+    <ul>
+      <li>Novo comentário no Fórum!</li>
+      <li>GP do Brasil começa em 2 dias!</li>
+    </ul>
+    <button onclick="document.getElementById('notif-popup').style.display='none'" style="margin-top:8px;">Fechar</button>
+  </div>
+  <script>
+    let currentIndex = 0;
+    const carousel = document.getElementById("carousel");
+    const newsItems = document.querySelectorAll(".news-item");
+    const side = document.getElementById("side-content");
+
+    const sideContents = [
+      {
+        title: "GP de Mônaco 2025",
+        desc: "Corrida emocionante nas ruas de Monte Carlo, com ultrapassagens históricas e clima imprevisível.",
+        facts: [
+          "Pole: Oscar Piastri",
+          "Vitória: Lando Norris",
+          "Volta mais rápida: Max Verstappen"
+        ]
+      },
+      {
+        title: "GP do Brasil 2025",
+        desc: "Interlagos recebeu uma das provas mais disputadas do ano, com chuva e muitas estratégias.",
+        facts: [
+          "Pole: Max Verstappen",
+          "Vitória: Oscar Piastri",
+          "Volta mais rápida: Lando Norris"
+        ]
+      },
+      {
+        title: "GP do Japão 2025",
+        desc: "Suzuka foi palco de grandes batalhas e definições importantes para o campeonato.",
+        facts: [
+          "Pole: Lando Norris",
+          "Vitória: Oscar Piastri",
+          "Volta mais rápida: Oscar Piastri"
+        ]
+      }
+    ];
+
+    function updateSideContent(index) {
+      const content = sideContents[index];
+      side.innerHTML = `
+        <h2>${content.title}</h2>
+        <p>${content.desc}</p>
+        <ul>
+          ${content.facts.map(f => `<li>${f}</li>`).join("")}
+        </ul>
+      `;
+    }
+
+    function moveSlide(direction) {
+      newsItems[currentIndex].classList.remove("active");
+      currentIndex = (currentIndex + direction + newsItems.length) % newsItems.length;
+      newsItems[currentIndex].classList.add("active");
+      updateSideContent(currentIndex);
+    }
+
+    window.onload = () => {
+      updateSideContent(currentIndex);
+      if(localStorage.getItem('theme') === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    };
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme');
+      if(current === 'light') {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'dark');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+        localStorage.setItem('theme', 'light');
+      }
+    }
+    function showNotif() {
+      document.getElementById('notif-popup').style.display = 'block';
+    }
+    function toggleAccess() {
+      const btn = document.getElementById('accessBtn');
+      if(document.body.style.fontSize === '1.2em') {
+        document.body.style.fontSize = '';
+        btn.classList.remove('active');
+      } else {
+        document.body.style.fontSize = '1.2em';
+        btn.classList.add('active');
+      }
+    }
+  </script>
+</body>
+</html>

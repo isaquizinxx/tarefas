@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>F1 Fórum - Ranking Pilotos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="pixil-frame-0_1.ico" type="image/x-icon">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;400&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --main-bg: linear-gradient(135deg, #222 60%, #111 100%);
+      --main-color: #fff;
+      --accent: #5be6ff;
+      --danger: #ff5555;
+      --navbar-bg: rgba(20,20,20,0.98);
+      --card-bg: #181818e0;
+      --table-bg: #181818e0;
+      --shadow: 0 8px 32px #00000060;
+      --radius: 18px;
+      --transition: 0.3s;
+    }
+    [data-theme="light"] {
+      --main-bg: linear-gradient(135deg, #e3e3e3 60%, #fff 100%);
+      --main-color: #222;
+      --accent: #0077ff;
+      --danger: #ff5555;
+      --navbar-bg: #f5f5f5;
+      --card-bg: #fff;
+      --table-bg: #fff;
+      --shadow: 0 8px 32px #0077ff22;
+    }
+    body {
+      margin: 0;
+      font-family: 'Montserrat', Arial, sans-serif;
+      background: var(--main-bg);
+      color: var(--main-color);
+      transition: background var(--transition), color var(--transition);
+    }
+    .navbar {
+      background: var(--navbar-bg);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      border-bottom: 4px solid var(--danger);
+      border-top: 4px solid var(--danger);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: var(--shadow);
+      animation: fadeInDown 0.7s;
+    }
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-30px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+    .logo img {
+      height: 56px;
+      margin-right: 24px;
+      filter: drop-shadow(0 0 6px var(--accent));
+      transition: filter var(--transition);
+    }
+    .search-bar {
+      margin-left: 24px;
+      padding: 8px 12px;
+      border-radius: var(--radius);
+      border: 1px solid #ccc;
+      font-size: 1em;
+      width: 180px;
+      background: #222;
+      color: #fff;
+      transition: box-shadow var(--transition);
+    }
+    .search-bar:focus {
+      box-shadow: 0 0 0 2px var(--accent);
+      outline: none;
+    }
+    .notif-btn, .access-btn, .theme-btn {
+      background: var(--accent);
+      color: black;
+      border: none;
+      border-radius: var(--radius);
+      padding: 8px 14px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-left: 12px;
+      transition: background var(--transition), color var(--transition), transform var(--transition);
+      box-shadow: 0 2px 8px #00000040;
+    }
+    .notif-btn:hover, .access-btn:hover, .theme-btn:hover {
+      background: var(--danger);
+      color: #fff;
+      transform: scale(1.08);
+    }
+    .access-btn.active {
+      background: #fff;
+      color: #222;
+      font-size: 1.2em;
+    }
+    .nav-item {
+      margin-right: 1.5rem;
+      position: relative;
+    }
+    .nav-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 1.1em;
+      padding: 1rem 0.5rem;
+      display: block;
+      border-radius: 5px;
+      font-weight: 700;
+      transition: color var(--transition), background var(--transition), transform var(--transition);
+      cursor: pointer;
+    }
+    .nav-link:hover, .dropdown-content a:hover {
+      color: var(--main-color);
+      background: var(--danger);
+      transform: scale(1.06);
+    }
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background: var(--navbar-bg);
+      min-width: 180px;
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      z-index: 20;
+      top: 100%;
+      left: 0;
+      animation: fadeIn 0.3s;
+    }
+    .dropdown-content a {
+      color: var(--accent);
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      border-radius: 5px;
+      transition: background var(--transition), color var(--transition);
+    }
+    .dropdown:hover .dropdown-content,
+    .dropdown:focus-within .dropdown-content {
+      display: block;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+    .user-area {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .user-pic {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--main-bg);
+      font-weight: bold;
+      font-size: 1.1em;
+      margin-right: 8px;
+      box-shadow: 0 2px 8px #00000040;
+      transition: background var(--transition), color var(--transition);
+    }
+    .user-pic:hover {
+      background: var(--danger);
+      color: #fff;
+    }
+    /* Cards dos pilotos */
+    .top3 {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      margin: 40px 0 24px 0;
+      flex-wrap: wrap;
+    }
+    .card {
+      background: linear-gradient(120deg, #1a1a1a 80%, #222 100%);
+      border: 2px solid var(--danger);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px 18px 18px 18px;
+      text-align: center;
+      width: 220px;
+      transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    .card:hover {
+      transform: scale(1.06) rotate(-1deg);
+      box-shadow: 0 12px 40px var(--accent);
+      border-color: var(--accent);
+    }
+    .card img {
+      width: 120px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 8px #00000060;
+      transition: box-shadow var(--transition), transform var(--transition);
+    }
+    .card:hover img {
+      box-shadow: 0 4px 24px var(--accent);
+      transform: scale(1.08);
+    }
+    .card h2 {
+      font-size: 2em;
+      margin: 0;
+      color: var(--danger);
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 8px #00000040;
+    }
+    .card h1 {
+      font-size: 1.3em;
+      margin: 8px 0 4px 0;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .card p {
+      margin: 2px 0;
+      font-size: 1em;
+      color: #ccc;
+    }
+    .card.verstappen {
+      border-color: var(--accent);
+      background: linear-gradient(120deg, #1a1a1a 80%, #0033cc 100%);
+    }
+    /* Tabela de ranking */
+    .ranking-table-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 40px;
+    }
+    table {
+      width: 95%;
+      max-width: 900px;
+      border-collapse: collapse;
+      background: var(--table-bg);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      margin: 0 auto;
+      font-size: 1.05em;
+    }
+    th, td {
+      padding: 12px 8px;
+      text-align: center;
+      border-bottom: 1px solid #333;
+    }
+    th {
+      background: #222;
+      color: var(--accent);
+      font-size: 1.1em;
+      letter-spacing: 1px;
+    }
+    tr:hover {
+      background: #222;
+      color: var(--danger);
+      transition: background var(--transition);
+    }
+    /* Gráfico de pontos */
+    .chart-container {
+      width: 100%;
+      max-width: 700px;
+      margin: 32px auto;
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px;
+      animation: fadeIn 1s;
+    }
+    /* Informações extras */
+    .extra-info {
+      width: 100%;
+      max-width: 900px;
+      margin: 32px auto 0 auto;
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px;
+      text-align: center;
+      color: var(--main-color);
+      animation: fadeIn 1.2s;
+    }
+    .extra-info h3 {
+      color: var(--accent);
+      margin-bottom: 12px;
+      font-size: 1.3em;
+      font-weight: 700;
+    }
+    .extra-info p {
+      color: #ccc;
+      margin-bottom: 8px;
+      font-size: 1.05em;
+    }
+    .extra-info a {
+      color: var(--danger);
+      text-decoration: underline;
+      font-weight: bold;
+      transition: color var(--transition);
+    }
+    .extra-info a:hover {
+      color: var(--accent);
+    }
+    /* Microinteração de foco */
+    .nav-link:focus, .dropdown-content a:focus {
+      outline: 2px solid var(--accent);
+      background: var(--danger);
+      color: #fff;
+    }
+    /* Responsividade */
+    @media (max-width: 700px) {
+      .top3 {
+        flex-direction: column;
+        align-items: center;
+        gap: 18px;
+      }
+      .card {
+        width: 90vw;
+        max-width: 320px;
+      }
+      table {
+        font-size: 0.95em;
+      }
+      .dropdown-content { left: 0; min-width: 90vw; }
+      .extra-info { padding: 12px; }
+      .chart-container { padding: 12px; }
+      .navbar { padding: 0 8px; }
+      .logo img { height: 40px; margin-right: 8px; }
+      .search-bar { width: 120px; margin-left: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="logo">
+      <a href="index1.html"><img src="f1logo1-removebg-preview.png" alt="F1 Logo"></a>
+    </div>
+    <input type="text" class="search-bar" placeholder="Buscar piloto, prova...">
+    <button class="notif-btn" onclick="window.location.href='notificacoes.html'">🔔</button>
+    <button class="access-btn" id="accessBtn" onclick="toggleAccess()">A+</button>
+    <div class="nav-item dropdown">
+      <a href="index1.html" class="nav-link">Dashboard</a>
+      <div class="dropdown-content">
+        <a href="index1.html">Página Inicial</a>
+        <a href="index2.html">Ranking Pilotos</a>
+        <a href="equipes.html">Ranking Equipes</a>
+        <a href="perfil.html">Meu Perfil</a>
+      </div>
+    </div>
+    <div class="nav-item dropdown">
+      <a href="index2.html" class="nav-link">Pilotos</a>
+      <div class="dropdown-content">
+        <a href="index2.html">Top 3 Pilotos</a>
+        <a href="piloto.html">Detalhes Piloto</a>
+        <a href="#">Histórico</a>
+      </div>
+    </div>
+    <div class="nav-item dropdown">
+      <a href="calendario.html" class="nav-link">Provas</a>
+      <div class="dropdown-content">
+        <a href="prova.html">GP de Mônaco</a>
+        <a href="prova.html">GP do Brasil</a>
+        <a href="calendario.html">Calendário 2025</a>
+      </div>
+    </div>
+    <div class="nav-item dropdown">
+      <a href="forum.html" class="nav-link">Fórum</a>
+      <div class="dropdown-content">
+        <a href="forum.html">Comentários</a>
+        <a href="notificacoes.html">Notificações</a>
+      </div>
+    </div>
+    <div class="user-area">
+      <a href="perfil.html"><div class="user-pic" title="Usuário">IZ</div></a>
+      <button class="theme-btn" onclick="toggleTheme()">🌙/☀️</button>
+    </div>
+  </nav>
+  <section class="top3">
+    <div class="card" tabindex="0">
+      <img src="2025mclarenlannor01right.avif" alt="Lando Norris">
+      <h2>2º</h2>
+      <h1>Lando Norris</h1>
+      <p>McLaren</p>
+      <p>275 pts</p>
+    </div>
+    <div class="card" tabindex="0">
+      <img src="2025mclarenoscpia01right (1).avif" alt="Oscar Piastri">
+      <h2>1º</h2>
+      <h1>Oscar Piastri</h1>
+      <p>McLaren</p>
+      <p>284 pts</p>
+    </div>
+    <div class="card verstappen" tabindex="0">
+      <img src="2025redbullracingmaxver01right.avif" alt="Max Verstappen">
+      <h2>3º</h2>
+      <h1>Max Verstappen</h1>
+      <p>Red Bull Racing</p>
+      <p>187 pts</p>
+    </div>
+  </section>
+  <div class="ranking-table-container">
+    <table>
+      <tr>
+        <th>POS.</th>
+        <th>PILOTO</th>
+        <th>NACIONALIDADE</th>
+        <th>EQUIPE</th>
+        <th>PTS.</th>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td>Oscar Piastri</td>
+        <td>Austrália</td>
+        <td>McLaren</td>
+        <td>284</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>Lando Norris</td>
+        <td>Reino Unido</td>
+        <td>McLaren</td>
+        <td>275</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>Max Verstappen</td>
+        <td>Holanda</td>
+        <td>Red Bull Racing</td>
+        <td>187</td>
+      </tr>
+    </table>
+  </div>
+  <div class="chart-container">
+    <h3 style="color:var(--accent);">Gráfico de Pontos dos Pilotos</h3>
+    <canvas id="pointsChart"></canvas>
+  </div>
+  <div class="extra-info">
+    <h3>Ranking atualizado!</h3>
+    <p>Confira os detalhes dos pilotos, equipes e estatísticas da temporada.</p>
+    <p>Volte para o <a href="index1.html">Dashboard</a> ou veja o <a href="calendario.html">Calendário de Provas</a>.</p>
+    <p>Participe do fórum e discuta os resultados das corridas!</p>
+  </div>
+  <script>
+    // Chart.js gráfico de pontos
+    const ctx = document.getElementById('pointsChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['GP 1', 'GP 2', 'GP 3', 'GP 4', 'GP 5'],
+        datasets: [
+          {
+            label: 'Oscar Piastri',
+            data: [50, 100, 160, 220, 284],
+            borderColor: '#5be6ff',
+            backgroundColor: '#5be6ff22',
+            fill: true,
+            tension: 0.
+          },
+          {
+            label: 'Lando Norris',
+            data: [40, 90, 140, 200, 275],
+            borderColor: '#ff5555',
+            backgroundColor: '#ff555522',
+            fill: true,
+            tension: 0.4
+          },
+          {
+            label: 'Max Verstappen',
+            data: [30, 70, 120, 160, 187],
+            borderColor: '#0033cc',
+            backgroundColor: '#0033cc22',
+            fill: true,
+            tension: 0.4
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { labels: { color: '#fff', font: { size: 14 } } } },
+        scales: { x: { ticks: { color: '#fff' } }, y: { ticks: { color: '#fff' } } }
+      }
+    });
+    // Tema claro/escuro e acessibilidade
+    window.onload = () => {
+      if(localStorage.getItem('theme') === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    };
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme');
+      if(current === 'light') {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'dark');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+        localStorage.setItem('theme', 'light');
+      }
+    }
+    function toggleAccess() {
+      const btn = document.getElementById('accessBtn');
+      if(document.body.style.fontSize === '1.2em') {
+        document.body.style.fontSize = '';
+        btn.classList.remove('active');
+      } else {
+        document.body.style.fontSize = '1.2em';
+        btn.classList.add('active');
+      }
+    }
+    // Busca inteligente (exemplo de microinteração)
+    document.querySelector('.search-bar').addEventListener('keyup', function(e) {
+      if(e.key === 'Enter') {
+        alert('Busca por: ' + this.value);
+      }
+    });
+  </script>
+</body>
+</html>
